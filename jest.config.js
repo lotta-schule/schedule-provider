@@ -1,3 +1,5 @@
 module.exports = {
-    roots: ["src"]
+    roots: ["src"],
+    collectCoverage: true,
+    coverageReporters: ["text"]
 };
