@@ -26,13 +26,8 @@ export class App {
         }
     }
 
-    public listen(port: number, callback?: Function): void {
-        createServer(this.app).listen(port, () => {
-            console.log(`listen on port ${port}`);
-            if (callback) {
-                callback();
-            }
-        });
+    public listen(port: number): void {
+        createServer(this.app).listen(port);
     }
 
     private setMiddlewares() {
