@@ -1,9 +1,28 @@
 stages:
-    - test
+  - test
+  - build
 
 test:
-    stage: test
-    image: node:12
-    script:
-        - npm install
-        - npm run test
+  stage: test
+  image: node:12
+  script:
+    - npm install
+    - npm run test
+
+docker image:
+  stage: build
+  image: docker:19.03.0
+  services:
+    - docker:19.03.0-dind
+  script:
+    - docker build -t lotta/schedule-provider:$CI_COMMIT_SHA .
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+    - docker push lotta/schedule-provider:$CI_COMMIT_SHA
+    - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker push lotta/schedule-provider:latest; fi;
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      environment:
+        name: production
+    - if: '$CI_COMMIT_REF_NAME == "develop"'
+      environment:
+        name: staging
