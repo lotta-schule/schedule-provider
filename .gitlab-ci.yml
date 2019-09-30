@@ -17,5 +17,5 @@ docker image:
   script:
     - docker build -t lotta/schedule-provider:$CI_COMMIT_SHA .
     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-    - docker push lotta/schedule-provider:$CI_COMMIT_SHA
-    - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker push lotta/schedule-provider:latest; fi;
+    - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker tag lotta/schedule-provider:$CI_COMMIT_SHA lotta/schedule-provider:latest; fi;
+    - docker push lotta/schedule-provider
