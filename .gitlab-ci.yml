@@ -23,7 +23,8 @@ docker image:
   services:
     - docker:19.03.0-dind
   script:
-    - docker build -t lotta/schedule-provider:$CI_COMMIT_SHA .
+    - docker pull lotta/schedule-provider:latest || true
+    - docker build --cache-from lotta/schedule-provider:latest -t lotta/schedule-provider:$CI_COMMIT_SHA .
     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
     - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker tag lotta/schedule-provider:$CI_COMMIT_SHA lotta/schedule-provider:latest; fi;
     - docker push lotta/schedule-provider
