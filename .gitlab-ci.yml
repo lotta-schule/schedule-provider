@@ -37,8 +37,9 @@ variables:
 deploy:
   stage: deploy
   image:
-    name: lotta/do-helm-deploy:313a06f2f3f0b2fe35850399b662e3839363ad64
+    name: lotta/do-helm-deploy:latest
   script:
+    - /user/local/bin/setup.sh
     - ls -lsa
     - pwd
     - which helm
