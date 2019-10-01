@@ -33,5 +33,5 @@ deploy:
   image: linkyard/docker-helm
   script:
     - helm init --upgrade
-    - helm repo add stable https://kubernetes-charts.storage.googleapis.com
-    - helm upgrade --install  php-app --namespace default --wait --set image.tag=${CI_PIPELINE_ID} --set replicaCount=2 helm-data/
+    - helm repo add lotta https://medienportal.gitlab.io/helm-charts
+    - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
