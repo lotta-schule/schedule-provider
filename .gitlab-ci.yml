@@ -36,8 +36,7 @@ docker image:
 
 deploy:
   stage: deploy
-  image: linkyard/docker-helm
+  image: lotta/do-helm-deploy
   script:
-    - helm init --client-only
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
