@@ -10,6 +10,11 @@ variables:
   # TODO: Set correct certs dir to /certs according to this article: https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
   DOCKER_TLS_CERTDIR: ""
 
+cache:
+  key: "lotta-schedule-provider-node-modules"
+  paths:
+    - node_modules/
+
 test:
   stage: test
   image: node:12
@@ -33,6 +38,6 @@ deploy:
   stage: deploy
   image: linkyard/docker-helm
   script:
-    - helm init --upgrade
+    - helm init --client-only
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
