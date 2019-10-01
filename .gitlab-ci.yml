@@ -39,6 +39,8 @@ deploy:
   image: lotta/do-helm-deploy
   script:
     - ls -lsa
+    - pwd
+    - which helm
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm repo update
     - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait
