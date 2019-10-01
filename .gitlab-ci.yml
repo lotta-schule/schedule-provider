@@ -2,6 +2,11 @@ stages:
   - test
   - build
 
+variables:
+  DOCKER_DRIVER: overlay2
+  # TODO: Set correct certs dir to /certs according to this article: https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
+  DOCKER_TLS_CERTDIR: ""
+
 test:
   stage: test
   image: node:12
@@ -19,3 +24,11 @@ docker image:
     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
     - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker tag lotta/schedule-provider:$CI_COMMIT_SHA lotta/schedule-provider:latest; fi;
     - docker push lotta/schedule-provider
+
+deploy:
+  stage: deploy
+  image: linkyard/docker-helm
+  script:
+    - helm init --upgrade
+    - helm repo add stable https://kubernetes-charts.storage.googleapis.com
+    - helm upgrade --install  php-app --namespace default --wait --set image.tag=${CI_PIPELINE_ID} --set replicaCount=2 helm-data/
