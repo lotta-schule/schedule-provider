@@ -45,5 +45,5 @@ deploy:
     - which helm
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm repo update
-    - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait
-  # - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
+    - helm upgrade --install lotta-schedule-provider lotta/lotta-schedule-provider --namespace lotta --wait
+  # - helm upgrade --install lotta-schedule-provider lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
