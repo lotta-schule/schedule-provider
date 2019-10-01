@@ -1,6 +1,6 @@
 stages:
-  - test
-  - build
+  # - test
+  # - build
   - deploy
 
 variables:
@@ -10,33 +10,36 @@ variables:
   # TODO: Set correct certs dir to /certs according to this article: https://about.gitlab.com/2019/07/31/docker-in-docker-with-docker-19-dot-03/
   DOCKER_TLS_CERTDIR: ""
 
-cache:
-  key: "lotta-schedule-provider-node-modules"
-  paths:
-    - node_modules/
+# cache:
+#   key: "lotta-schedule-provider-node-modules"
+#   paths:
+#     - node_modules/
 
-test:
-  stage: test
-  image: node:12
-  script:
-    - npm install
-    - npm run test
+# test:
+#   stage: test
+#   image: node:12
+#   script:
+#     - npm install
+#     - npm run test
 
-docker image:
-  stage: build
-  image: docker:19.03.0
-  services:
-    - docker:19.03.0-dind
-  script:
-    - docker pull lotta/schedule-provider:latest || true
-    - docker build --cache-from lotta/schedule-provider:latest -t lotta/schedule-provider:$CI_COMMIT_SHA .
-    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-    - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker tag lotta/schedule-provider:$CI_COMMIT_SHA lotta/schedule-provider:latest; fi;
-    - docker push lotta/schedule-provider
+# docker image:
+#   stage: build
+#   image: docker:19.03.0
+#   services:
+#     - docker:19.03.0-dind
+#   script:
+#     - docker pull lotta/schedule-provider:latest || true
+#     - docker build --cache-from lotta/schedule-provider:latest -t lotta/schedule-provider:$CI_COMMIT_SHA .
+#     - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+#     - if [ $CI_COMMIT_REF_NAME == "master" ]; then docker tag lotta/schedule-provider:$CI_COMMIT_SHA lotta/schedule-provider:latest; fi;
+#     - docker push lotta/schedule-provider
 
 deploy:
   stage: deploy
   image: lotta/do-helm-deploy
   script:
+    - ls -lsa
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
-    - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
+    - helm repo update
+    - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait
+  # - helm upgrade --install lotta/lotta-schedule-provider --namespace lotta --wait --set image.tag=${CI_COMMIT_SHA} --set replicaCount=2 --set honeybadger.enabled=true --set honeybadger.apiKey=$HONEYBADGER_API_KEY
