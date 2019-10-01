@@ -24,6 +24,8 @@ FROM node:12-alpine
 ENV DIR=/usr/src/service
 WORKDIR $DIR
 
+EXPOSE 3000
+
 # Copy files from build stage
 COPY --from=build /src /src
 
