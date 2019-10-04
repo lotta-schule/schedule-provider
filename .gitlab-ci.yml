@@ -53,6 +53,7 @@ deploy:staging:
       --set replicaCount=1
       --set honeybadger.enabled=true
       --set honeybadger.apiKey=$HONEYBADGER_API_KEY
+    - curl -g "https://api.honeybadger.io/v1/deploys?deploy[environment]=staging&deploy[repository]=$CI_REPOSITORY_URL&deploy[revision]=$CI_COMMIT_SHA&api_key=$HONEYBADGER_API_KEY"
   only:
     refs:
       - develop
@@ -74,6 +75,7 @@ deploy:production:
       --set replicaCount=2
       --set honeybadger.enabled=true
       --set honeybadger.apiKey=$HONEYBADGER_API_KEY
+    - curl -g "https://api.honeybadger.io/v1/deploys?deploy[environment]=staging&deploy[repository]=$CI_REPOSITORY_URL&deploy[revision]=$CI_COMMIT_SHA&api_key=$HONEYBADGER_API_KEY"
   only:
     refs:
       - master
