@@ -15,7 +15,8 @@ export class App {
         if (process.env.HONEYBADGER_API_KEY) {
             // tslint:disable-next-line:no-var-requires
             const Honeybadger = require('honeybadger').configure({
-                apiKey: process.env.HONEYBADGER_API_KEY
+                apiKey: process.env.HONEYBADGER_API_KEY,
+                environment: process.env.APP_ENVIRONMENT
             });
 
             this.expressApp.use(Honeybadger.requestHandler);
