@@ -46,12 +46,16 @@ deploy:staging:
     - /user/local/bin/setup.sh
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm repo update
-    - helm upgrade --install lotta-schedule-provider lotta/lotta-schedule-provider
+    - helm upgrade --install lotta-schedule-provider-staging lotta/lotta-schedule-provider
       --namespace lotta-staging --wait
+      --set appEnvironment=staging
       --set image.tag=${CI_COMMIT_SHA}
       --set replicaCount=1
       --set honeybadger.enabled=true
       --set honeybadger.apiKey=$HONEYBADGER_API_KEY
+  only:
+    refs:
+      - develop
 
 deploy:production:
   stage: deploy
@@ -64,6 +68,7 @@ deploy:production:
     - helm repo add lotta https://medienportal.gitlab.io/helm-charts
     - helm repo update
     - helm upgrade --install lotta-schedule-provider lotta/lotta-schedule-provider
+      --set appEnvironment=production
       --namespace lotta --wait
       --set image.tag=${CI_COMMIT_SHA}
       --set replicaCount=2
