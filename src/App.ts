@@ -39,13 +39,19 @@ export class App {
             const password = request.query.password;
             const className = request.query.class;
             const source = request.query.source as ScheduleOptionsSource;
-            response
-                .header('Content-Type', 'application/json')
-                .send(await Indiware.getSchedule({
+
+            try {
+                const schedule = await Indiware.getSchedule({
                     class: className,
                     source,
                     configuration: { schoolId, username, password }
-                }));
+                });
+                response
+                    .header('Content-Type', 'application/json')
+                    .send(schedule);
+            } catch (e) {
+                response.sendStatus(400);
+            }
         });
     };
 }

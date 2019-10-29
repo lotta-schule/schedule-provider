@@ -1,7 +1,11 @@
 version: "3.4"
 
+networks:
+  api_api:
+    external: true
+
 services:
-  app:
+  schedule_provider:
     image: node
     working_dir: /usr/src/svc
     env_file: .env
@@ -10,3 +14,5 @@ services:
     ports:
       - "3001:3000"
     command: "npm run dev:start"
+    networks:
+      - api_api
