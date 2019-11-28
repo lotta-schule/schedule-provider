@@ -166,10 +166,23 @@ describe('Indiware Teachers', () => {
         });
     });
 
-    it('should have footer data', async done => {
-        const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '11', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
-        const { footer } = schedule;
-        expect(footer).toBeDefined();
-        done();
+    describe('footer data', () => {
+        it('should have footer data', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Har', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+            const { footer } = schedule;
+            expect(footer).toBeDefined();
+            done();
+        });
+
+        it('should have supervision data if there is any', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Har', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+            const { footer } = schedule;
+            expect(footer.supervisions).toBeDefined();
+            expect(footer.supervisions.length).toEqual(1);
+            expect(footer.supervisions[0]).toEqual({ time: '13:00', location: 'Haus D' });
+            expect(footer).toBeDefined();
+            done();
+        });
+
     });
 });

@@ -34,6 +34,13 @@ interface IndiwareResult {
                         Nr: [string];
                         If: [string];
                     }[]
+                }],
+                Aufsichten: [{
+                    Aufsicht: [{
+                        AuUhrzeit: [string];
+                        AuZeit: [string];
+                        AuOrt: [string];
+                    }]
                 }]
             }]
         }];
@@ -49,7 +56,7 @@ export class Indiware {
         return {
             head: Indiware.parseKopf(plan),
             body: Indiware.parseKlassen(plan, options),
-            footer: Indiware.parseFooter(plan)
+            footer: Indiware.parseFooter(plan, options)
         };
     }
 
@@ -95,11 +102,27 @@ export class Indiware {
         }
     }
 
-    private static parseFooter(plan: IndiwareResult): ScheduleResultFooter {
+    private static parseFooter(plan: IndiwareResult, options: ScheduleOptions<IndiwareOptions>): ScheduleResultFooter {
         const { VpMobil: { ZusatzInfo } } = plan;
         return {
-            comments: ZusatzInfo && ZusatzInfo[0].ZiZeile
+            comments: ZusatzInfo && ZusatzInfo[0].ZiZeile,
+            supervisions: this.parseSupervisions(plan, options)
         };
+    }
+
+    private static parseSupervisions(plan: IndiwareResult, options: ScheduleOptions<IndiwareOptions>) {
+        if (options.source === ScheduleOptionsSource.INDIWARE_STUDENT) {
+            return null;
+        }
+        const { VpMobil: { Klassen } } = plan;
+        const klasse = Klassen[0].Kl.find(Kl => Kl.Kurz[0] === options.class);
+        if (klasse && klasse.Aufsichten) {
+            return klasse.Aufsichten.map(aufsicht => aufsicht.Aufsicht?.[0] && ({
+                time: aufsicht.Aufsicht[0].AuUhrzeit[0],
+                location: aufsicht.Aufsicht[0].AuOrt[0],
+            }));
+        }
+        return null;
     }
 
     private static call(options: ScheduleOptions<IndiwareOptions>): Promise<any> {
