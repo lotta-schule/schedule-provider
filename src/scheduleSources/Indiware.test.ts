@@ -2,15 +2,14 @@ import nock from 'nock';
 import { resolve } from 'path';
 import { Indiware } from './Indiware';
 import { ScheduleOptionsSource } from '../model/ScheduleOptions';
+import { readFileSync } from 'fs';
 
 describe('Indiware Student', () => {
     beforeEach(() => {
         nock('https://www.stundenplan24.de')
             .get('/10107295/mobil/mobdaten/Klassen.xml')
             .basicAuth({ user: 'schueler', pass: '123' })
-            .replyWithFile(200, resolve(process.cwd(), 'test/mock/indiware/Klassen.xml'), {
-                'Content-Type': 'application/xml'
-            });
+            .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/Klassen.xml'), { encoding: 'utf8' }));
     });
     it('should return an object with head, body and footer', async done => {
         const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
@@ -20,15 +19,106 @@ describe('Indiware Student', () => {
         done();
     });
 
-    it('should have header data', async done => {
-        const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
-        const { head } = schedule;
-        expect(head).toBeDefined();
-        expect(head.date).toBeTruthy();
-        expect(head.timestamp).toBeTruthy();
-        expect(head.type).toEqual('K');
-        expect(head.filename).toBeTruthy();
-        done();
+    describe('request specific date', () => {
+        beforeEach(() => {
+            nock('https://www.stundenplan24.de')
+                .get('/10107295/mobil/mobdaten/PlanKl20200106.xml')
+                .basicAuth({ user: 'schueler', pass: '123' })
+                .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/PlanKl20200106.xml'), { encoding: 'utf8' }));
+        });
+        it('should return an object with head, body and footer', async done => {
+            const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', date: '20200106', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
+            expect(vplan).toHaveProperty('head');
+            expect(vplan.head.filename).toEqual('PlanKl20200106.xml');
+            done();
+        });
+    });
+
+    describe('header data', () => {
+        it('should have header data', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
+            const { head } = schedule;
+            expect(head).toBeDefined();
+            expect(head.date).toBeTruthy();
+            expect(head.timestamp).toBeTruthy();
+            expect(head.type).toEqual('K');
+            expect(head.filename).toBeTruthy();
+            done();
+        });
+
+        it('should have property with dates to skip', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
+            const { head } = schedule;
+            expect(head.skipDates).toBeTruthy();
+            expect(head.skipDates).toEqual([
+                new Date(2019, 7, 1).toUTCString(),
+                new Date(2019, 7, 2).toUTCString(),
+                new Date(2019, 7, 5).toUTCString(),
+                new Date(2019, 7, 6).toUTCString(),
+                new Date(2019, 7, 7).toISOString(),
+                new Date(2019, 7, 8).toISOString(),
+                new Date(2019, 7, 9).toISOString(),
+                new Date(2019, 7, 12).toISOString(),
+                new Date(2019, 7, 13).toISOString(),
+                new Date(2019, 7, 14).toISOString(),
+                new Date(2019, 7, 15).toISOString(),
+                new Date(2019, 7, 16).toISOString(),
+                new Date(2019, 9, 3).toISOString(),
+                new Date(2019, 9, 14).toISOString(),
+                new Date(2019, 9, 15).toISOString(),
+                new Date(2019, 9, 16).toISOString(),
+                new Date(2019, 9, 17).toISOString(),
+                new Date(2019, 9, 18).toISOString(),
+                new Date(2019, 9, 21).toISOString(),
+                new Date(2019, 9, 22).toISOString(),
+                new Date(2019, 9, 23).toISOString(),
+                new Date(2019, 9, 24).toISOString(),
+                new Date(2019, 9, 25).toISOString(),
+                new Date(2019, 9, 31).toISOString(),
+                new Date(2019, 10, 20).toISOString(),
+                new Date(2019, 11, 23).toISOString(),
+                new Date(2019, 11, 24).toISOString(),
+                new Date(2019, 11, 25).toISOString(),
+                new Date(2019, 11, 26).toISOString(),
+                new Date(2019, 11, 27).toISOString(),
+                new Date(2019, 11, 30).toISOString(),
+                new Date(2019, 11, 31).toISOString(),
+                new Date(2020, 0, 1).toISOString(),
+                new Date(2020, 0, 2).toISOString(),
+                new Date(2020, 0, 3).toISOString(),
+                new Date(2020, 1, 10).toISOString(),
+                new Date(2020, 1, 11).toISOString(),
+                new Date(2020, 1, 12).toISOString(),
+                new Date(2020, 1, 13).toISOString(),
+                new Date(2020, 1, 14).toISOString(),
+                new Date(2020, 1, 17).toISOString(),
+                new Date(2020, 1, 18).toISOString(),
+                new Date(2020, 1, 19).toISOString(),
+                new Date(2020, 1, 20).toISOString(),
+                new Date(2020, 1, 21).toISOString(),
+                new Date(2020, 3, 10).toISOString(),
+                new Date(2020, 3, 13).toISOString(),
+                new Date(2020, 3, 14).toISOString(),
+                new Date(2020, 3, 15).toISOString(),
+                new Date(2020, 3, 16).toISOString(),
+                new Date(2020, 3, 17).toISOString(),
+                new Date(2020, 4, 1).toISOString(),
+                new Date(2020, 4, 21).toISOString(),
+                new Date(2020, 4, 22).toISOString(),
+                new Date(2020, 5, 1).toISOString(),
+                new Date(2020, 6, 20).toISOString(),
+                new Date(2020, 6, 21).toISOString(),
+                new Date(2020, 6, 22).toISOString(),
+                new Date(2020, 6, 23).toISOString(),
+                new Date(2020, 6, 24).toISOString(),
+                new Date(2020, 6, 27).toISOString(),
+                new Date(2020, 6, 28).toISOString(),
+                new Date(2020, 6, 29).toISOString(),
+                new Date(2020, 6, 30).toISOString(),
+                new Date(2020, 6, 31).toISOString()
+            ])
+            done();
+        });
     });
 
     describe('body data', () => {
@@ -99,28 +189,116 @@ describe('Indiware Teachers', () => {
         nock('https://www.stundenplan24.de')
             .get('/10107295/moble/mobdaten/Lehrer.xml')
             .basicAuth({ user: 'lehrer', pass: '123' })
-            .replyWithFile(200, resolve(process.cwd(), 'test/mock/indiware/Lehrer.xml'), {
-                'Content-Type': 'application/xml'
-            });
+            .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/Lehrer.xml'), { encoding: 'utf8' }));
     });
-
     it('should return an object with head, body and footer', async done => {
-        const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '11', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+        const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
         expect(vplan).toHaveProperty('head');
         expect(vplan).toHaveProperty('body');
         expect(vplan).toHaveProperty('footer');
         done();
     });
 
-    it('should have header data', async done => {
-        const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
-        const { head } = schedule;
-        expect(head).toBeDefined();
-        expect(head.date).toBeTruthy();
-        expect(head.timestamp).toBeTruthy();
-        expect(head.type).toEqual('L');
-        expect(head.filename).toBeTruthy();
-        done();
+    describe('request specific date', () => {
+        beforeEach(() => {
+            nock('https://www.stundenplan24.de')
+                .get('/10107295/moble/mobdaten/PlanLe20200106.xml')
+                .basicAuth({ user: 'lehrer', pass: '123' })
+                .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/PlanLe20200106.xml'), { encoding: 'utf8' }));
+        });
+        it('should return an object with head, body and footer', async done => {
+            const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', date: '20200106', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+            expect(vplan).toHaveProperty('head');
+            expect(vplan.head.filename).toEqual('PlanLe20200106.xml');
+            done();
+        });
+    });
+
+    describe('header data', () => {
+        it('should have header data', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+            const { head } = schedule;
+            expect(head).toBeDefined();
+            expect(head.date).toBeTruthy();
+            expect(head.timestamp).toBeTruthy();
+            expect(head.type).toEqual('L');
+            expect(head.filename).toBeTruthy();
+            done();
+        });
+
+        it('should have property with dates to skip', async done => {
+            const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
+            const { head } = schedule;
+            expect(head.skipDates).toBeTruthy();
+            expect(head.skipDates).toEqual([
+                new Date(2019, 7, 1).toUTCString(),
+                new Date(2019, 7, 2).toUTCString(),
+                new Date(2019, 7, 5).toUTCString(),
+                new Date(2019, 7, 6).toUTCString(),
+                new Date(2019, 7, 7).toUTCString(),
+                new Date(2019, 7, 8).toUTCString(),
+                new Date(2019, 7, 9).toUTCString(),
+                new Date(2019, 7, 12).toUTCString(),
+                new Date(2019, 7, 13).toUTCString(),
+                new Date(2019, 7, 14).toUTCString(),
+                new Date(2019, 7, 15).toUTCString(),
+                new Date(2019, 7, 16).toUTCString(),
+                new Date(2019, 9, 3).toUTCString(),
+                new Date(2019, 9, 14).toUTCString(),
+                new Date(2019, 9, 15).toUTCString(),
+                new Date(2019, 9, 16).toUTCString(),
+                new Date(2019, 9, 17).toUTCString(),
+                new Date(2019, 9, 18).toUTCString(),
+                new Date(2019, 9, 21).toUTCString(),
+                new Date(2019, 9, 22).toUTCString(),
+                new Date(2019, 9, 23).toUTCString(),
+                new Date(2019, 9, 24).toUTCString(),
+                new Date(2019, 9, 25).toUTCString(),
+                new Date(2019, 9, 31).toUTCString(),
+                new Date(2019, 10, 20).toUTCString(),
+                new Date(2019, 11, 23).toUTCString(),
+                new Date(2019, 11, 24).toUTCString(),
+                new Date(2019, 11, 25).toUTCString(),
+                new Date(2019, 11, 26).toUTCString(),
+                new Date(2019, 11, 27).toUTCString(),
+                new Date(2019, 11, 30).toUTCString(),
+                new Date(2019, 11, 31).toUTCString(),
+                new Date(2020, 0, 1).toUTCString(),
+                new Date(2020, 0, 2).toUTCString(),
+                new Date(2020, 0, 3).toUTCString(),
+                new Date(2020, 1, 10).toUTCString(),
+                new Date(2020, 1, 11).toUTCString(),
+                new Date(2020, 1, 12).toUTCString(),
+                new Date(2020, 1, 13).toUTCString(),
+                new Date(2020, 1, 14).toUTCString(),
+                new Date(2020, 1, 17).toUTCString(),
+                new Date(2020, 1, 18).toUTCString(),
+                new Date(2020, 1, 19).toUTCString(),
+                new Date(2020, 1, 20).toUTCString(),
+                new Date(2020, 1, 21).toUTCString(),
+                new Date(2020, 3, 10).toUTCString(),
+                new Date(2020, 3, 13).toUTCString(),
+                new Date(2020, 3, 14).toUTCString(),
+                new Date(2020, 3, 15).toUTCString(),
+                new Date(2020, 3, 16).toUTCString(),
+                new Date(2020, 3, 17).toUTCString(),
+                new Date(2020, 4, 1).toUTCString(),
+                new Date(2020, 4, 21).toUTCString(),
+                new Date(2020, 4, 22).toUTCString(),
+                new Date(2020, 5, 1).toUTCString(),
+                new Date(2020, 6, 20).toUTCString(),
+                new Date(2020, 6, 21).toUTCString(),
+                new Date(2020, 6, 22).toUTCString(),
+                new Date(2020, 6, 23).toUTCString(),
+                new Date(2020, 6, 24).toUTCString(),
+                new Date(2020, 6, 27).toUTCString(),
+                new Date(2020, 6, 28).toUTCString(),
+                new Date(2020, 6, 29).toUTCString(),
+                new Date(2020, 6, 30).toUTCString(),
+                new Date(2020, 6, 31).toUTCString()
+            ])
+            done();
+        });
     });
 
     describe('body data', () => {

@@ -18,6 +18,7 @@ interface IndiwareResult {
             planart: [string];
             datei: [string];
         }];
+        FreieTage: [{ ft: [string] }];
         Klassen: [{
             Kl: [{
                 Kurz: [string];
@@ -61,12 +62,13 @@ export class Indiware {
     }
 
     private static parseKopf(plan: IndiwareResult): ScheduleResultHead {
-        const { VpMobil: { Kopf } } = plan;
+        const { VpMobil: { Kopf, FreieTage } } = plan;
         return {
             date: Kopf[0].DatumPlan[0],
             timestamp: Kopf[0].zeitstempel[0],
             type: Kopf[0].planart[0],
-            filename: Kopf[0].datei[0]
+            filename: Kopf[0].datei[0],
+            skipDates: FreieTage?.[0].ft.map(ft => this.parseShortDateString(ft).toUTCString())
         }
     }
 
@@ -125,17 +127,41 @@ export class Indiware {
         return null;
     }
 
-    private static call(options: ScheduleOptions<IndiwareOptions>): Promise<any> {
-        const fileName = options.source === ScheduleOptionsSource.INDIWARE_TEACHER ? 'moble/mobdaten/Lehrer.xml' : 'mobil/mobdaten/Klassen.xml';
-        const url = `https://www.stundenplan24.de/${options.configuration.schoolId}/${fileName}`;
-        const axiosConfig: AxiosRequestConfig = { url };
+    private static parseShortDateString(dateString: string): Date {
+        const year = parseInt(dateString.slice(0, 2)) + 2000;
+        const monthIndex = parseInt(dateString.slice(2, 4)) - 1;
+        const day = parseInt(dateString.slice(4, 6));
+        const date = new Date(year, monthIndex, day);
+        return date;
+    }
+
+    private static getFileUrl(options: ScheduleOptions<IndiwareOptions>): string {
+        const baseUrl = `https://www.stundenplan24.de/${options.configuration.schoolId}/`;
+        if (options.source === ScheduleOptionsSource.INDIWARE_TEACHER) {
+            const path = 'moble/mobdaten/';
+            const filename = options.date ? `PlanLe${options.date}.xml` : 'Lehrer.xml';
+            return baseUrl + path + filename;
+        } else {
+            const path = 'mobil/mobdaten/';
+            const filename = options.date ? `PlanKl${options.date}.xml` : 'Klassen.xml';
+            return baseUrl + path + filename;
+        }
+    }
+
+    private static async call(options: ScheduleOptions<IndiwareOptions>): Promise<any> {
+        const axiosConfig: AxiosRequestConfig = {
+            method: 'GET',
+            url: this.getFileUrl(options),
+            responseType: undefined
+        };
         if (options.configuration.username) {
             axiosConfig.auth = {
                 username: options.configuration.username,
                 password: options.configuration.password
             };
         }
-        return axios(axiosConfig)
-            .then(result => parseStringPromise(result.data.toString(), {}));
+        const result = await axios(axiosConfig);
+        const xml = result.data.toString();
+        return parseStringPromise(xml);
     }
 }
