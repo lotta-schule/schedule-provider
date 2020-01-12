@@ -38,11 +38,13 @@ export class App {
             const username = request.query.username;
             const password = request.query.password;
             const className = request.query.class;
+            const date = request.query.date; // date in format YYYYMMDD
             const source = request.query.source as ScheduleOptionsSource;
 
             try {
                 const schedule = await Indiware.getSchedule({
                     class: className,
+                    date,
                     source,
                     configuration: { schoolId, username, password }
                 });

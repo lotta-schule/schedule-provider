@@ -6,5 +6,6 @@ export enum ScheduleOptionsSource {
 export interface ScheduleOptions<T = any> {
     source: ScheduleOptionsSource;
     class: string;
+    date?: string;
     configuration: T;
 }

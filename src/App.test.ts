@@ -1,7 +1,8 @@
 import { App } from './App';
-import request from 'supertest';
 import { ScheduleOptionsSource } from './model/ScheduleOptions';
 import { resolve } from 'path';
+import { readFileSync } from 'fs';
+import request from 'supertest';
 import nock from 'nock';
 
 describe('web server', () => {
@@ -18,7 +19,7 @@ describe('web server', () => {
         nock('https://www.stundenplan24.de')
             .get('/10107295/mobil/mobdaten/Klassen.xml')
             .basicAuth({ user: 'schueler', pass: '123' })
-            .replyWithFile(200, resolve(process.cwd(), 'test/mock/indiware/Klassen.xml'), {
+            .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/Klassen.xml')), {
                 'Content-Type': 'application/xml'
             });
         const res = await request(app.app)
