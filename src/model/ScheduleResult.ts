@@ -16,7 +16,7 @@ export interface ScheduleResultBody {
     name: string;
     short: string;
     schedule: {
-        id: string;
+        id?: string;
         lessonIndex: number;
         lessonName: string;
         lessonNameHasChanged?: boolean;

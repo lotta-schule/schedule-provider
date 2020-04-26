@@ -87,7 +87,7 @@ export class Indiware {
                     const [room, roomHasChanged] = typeof Std.Ra[0] === 'string' ?
                         [Std.Ra[0], false] : [Std.Ra[0]._, true];
                     return {
-                        id: Std.Nr[0],
+                        id: Std.Nr?.[0],
                         lessonIndex: Number(Std.St[0]),
                         lessonName,
                         lessonNameHasChanged,
