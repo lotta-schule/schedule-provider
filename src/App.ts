@@ -52,6 +52,7 @@ export class App {
                     .header('Content-Type', 'application/json')
                     .send(schedule);
             } catch (e) {
+                console.error(e);
                 response.sendStatus(400);
             }
         });
