@@ -1,4 +1,5 @@
 import Express, { Application } from 'express';
+import Sentry from '@sentry/node';
 import morgan from 'morgan';
 import { createServer } from 'http';
 import { Indiware } from './scheduleSources/Indiware';
@@ -12,16 +13,10 @@ export class App {
     }
 
     constructor() {
-        if (process.env.HONEYBADGER_API_KEY) {
-            // tslint:disable-next-line:no-var-requires
-            const Honeybadger = require('honeybadger').configure({
-                apiKey: process.env.HONEYBADGER_API_KEY,
-                environment: process.env.APP_ENVIRONMENT
-            });
-
-            this.expressApp.use(Honeybadger.requestHandler);
+        if (process.env.SENTRY_DSN) {
+            this.expressApp.use(Sentry.Handlers.requestHandler());
             this.setMiddlewares();
-            this.expressApp.use(Honeybadger.errorHandler);
+            this.expressApp.use(Sentry.Handlers.errorHandler());
         } else {
             this.setMiddlewares();
         }
