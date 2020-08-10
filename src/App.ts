@@ -1,5 +1,5 @@
 import Express, { Application } from 'express';
-import Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node';
 import morgan from 'morgan';
 import { createServer } from 'http';
 import { Indiware } from './scheduleSources/Indiware';
