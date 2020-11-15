@@ -17,7 +17,7 @@ cache:
 
 test:
   stage: test
-  image: node:14
+  image: node:15
   script:
     - npm install
     - npm run test
@@ -35,28 +35,6 @@ build docker image:
         then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination lotta/schedule-provider:$CI_COMMIT_SHA --destination lotta/schedule-provider:stable --destination lotta/schedule-provider:latest;
         else /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination lotta/schedule-provider:$CI_COMMIT_SHA;
         fi
-
-deploy:staging:
-  stage: deploy
-  environment:
-    name: staging
-  image:
-    name: lotta/do-helm-deploy:latest
-  script:
-    - /user/local/bin/setup.sh
-    - curl -i "https://sentry.io/api/0/organizations/$SENTRY_ORGANIZATION_SLUG/releases/" -X POST -H "Authorization:Bearer $SENTRY_API_TOKEN" -H 'Content-Type:application/json' -d "{ \"version\":\"timetable-provider-$CI_COMMIT_SHA\", \"refs\":[{ \"repository\":\"$CI_PROJECT_PATH\", \"commit\":\"$CI_COMMIT_SHA\", \"previousCommit\":\"$CI_COMMIT_BEFORE_SHA\" }], \"projects\":[\"timetable-provider\"] }"
-    - helm repo add lotta https://medienportal.gitlab.io/helm-charts
-    - helm repo update
-    - helm upgrade --install lotta-schedule-provider-staging lotta/lotta-schedule-provider
-      --namespace lotta-staging --wait
-      --set appEnvironment=staging
-      --set image.tag=${CI_COMMIT_SHA}
-      --set replicaCount=1
-      --set sentry.dsn=$SENTRY_DSN
-    - curl -i "https://sentry.io/api/0/organizations/$SENTRY_ORGANIZATION_SLUG/releases/timetable-provider-$CI_COMMIT_SHA/deploys/" -X POST -X POST -H 'Content-Type:application/json' -H "Authorization:Bearer $SENTRY_API_TOKEN" -d '{"environment":"staging"}'
-  only:
-    refs:
-      - develop
 
 deploy:production:
   stage: deploy
