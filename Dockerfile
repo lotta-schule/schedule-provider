@@ -1,4 +1,4 @@
-FROM node:14-alpine AS build
+FROM node:15-alpine AS build
 
 # build tools
 RUN apk add --update --no-cache \
@@ -10,13 +10,13 @@ ENV CI=true
 
 ADD . /src
 WORKDIR /src
-RUN npm install
+RUN npm install --production=false
 RUN npm run build
 RUN npm prune --production
 
 # Dockerfile continued
 
-FROM node:14-alpine
+FROM node:15-alpine
 
 # install curl for healthcheck
 # RUN apk add --update --no-cache curl
