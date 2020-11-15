@@ -28,7 +28,7 @@ export class App {
 
     private setMiddlewares() {
         this.expressApp.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', { skip: () => process.env.NODE_ENV === 'test' }));
-        this.expressApp.get('/schedule.json', async (request, response, next) => {
+        this.expressApp.get('/schedule.json', async (request, response, _next) => {
             const schoolId = request.query.schoolId as string;
             const username = request.query.username as string;
             const password = request.query.password as string;
