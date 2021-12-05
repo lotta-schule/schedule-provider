@@ -44,10 +44,14 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
-      - uses: mattallty/jest-github-action@v1
-        name: Run tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        run: npm test -- --coverage
+
+      - name: Codecov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          directory: coverage
+          fail_ci_if_error: true
           
           
   build:
