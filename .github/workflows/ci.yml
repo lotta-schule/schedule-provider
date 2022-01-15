@@ -121,4 +121,4 @@ jobs:
           docker tag lotta/schedule-provider lotta/schedule-provider:$RELEASE_VERSION
           docker push lotta/schedule-provider:$RELEASE_VERSION
           docker push lotta/schedule-provider
-        end
+        fi
