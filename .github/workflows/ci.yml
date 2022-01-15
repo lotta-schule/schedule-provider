@@ -76,6 +76,10 @@ jobs:
           path: image.tar
     
   push:
+    needs:
+      - build
+      - test
+
     runs-on: ubuntu-latest
     
     steps:
