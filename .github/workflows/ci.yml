@@ -72,13 +72,15 @@ jobs:
         run: docker build -t lotta/schedule-provider .
         
       - name: Save docker image
-        run: docker save -o image.tar lotta/schedule-provider
+        run: |
+          mkdir -p artifact
+          docker save -o artifact/image.tar lotta/schedule-provider
     
       - name: Docker image build artifact upload
         uses: actions/upload-artifact@v2.2.4
         with:
           name: docker-image
-          path: image.tar
+          path: artifact
     
   push:
     needs:
@@ -89,13 +91,16 @@ jobs:
     
     steps:
     - name: Set env
-      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tag/}" >> $GITHUB_ENV
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        fi;
 
     - name: Download built image
       uses: actions/download-artifact@v2.0.10
       with:
         name: docker-image
-        path: image.tar
+        path: artifact
 
     - name: Docker Login
       uses: docker/login-action@v1.10.0
@@ -106,7 +111,7 @@ jobs:
     
     - name: load image from archive
       run: |
-        docker load -i image.tar
+        docker load -i artifact/image.tar
         
     - name: push image to registry
       run: |
