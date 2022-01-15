@@ -116,5 +116,8 @@ jobs:
     - name: push image to registry
       run: |
         docker tag lotta/schedule-provider lotta/schedule-provider:$GITHUB_SHA
-        [ -z "$RELEASE_VERSION" ] || docker tag lotta/schedule-provider lotta/schedule-provider:$RELEASE_VERSION
-        docker push lotta/schedule-provider
+        docker push lotta/schedule-provider:$GITHUB_SHA
+        if ! [ -z "$RELEASE_VERSION" ]; then
+          docker tag lotta/schedule-provider lotta/schedule-provider:$RELEASE_VERSION
+          docker push lotta/schedule-provider:$RELEASE_VERSION
+        end
