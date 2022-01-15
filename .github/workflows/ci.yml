@@ -23,11 +23,13 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
 
   test:
-    needs: [ setup ]
+    needs:
+      - setup
+
     runs-on: ubuntu-latest
     
     steps:
@@ -56,6 +58,9 @@ jobs:
           
           
   build:
+    needs:
+      - setup
+
     runs-on: ubuntu-latest
     
     steps:
