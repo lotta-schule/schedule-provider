@@ -7,15 +7,14 @@ import nock from 'nock';
 
 describe('web server', () => {
     const app = new App();
-    it('should show a 404 on homepage', async done => {
+    it('should show a 404 on homepage', async () => {
         const res = await request(app.app)
             .get('/')
             .send();
         expect(res.status).toEqual(404);
-        done();
     });
 
-    it('should return a valid status 200 json schedule', async done => {
+    it('should return a valid status 200 json schedule', async () => {
         nock('https://www.stundenplan24.de')
             .get('/10107295/mobil/mobdaten/Klassen.xml')
             .basicAuth({ user: 'schueler', pass: '123' })
@@ -33,6 +32,5 @@ describe('web server', () => {
             })
             .send();
         expect(res.status).toEqual(200);
-        done();
     });
 });

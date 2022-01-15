@@ -11,12 +11,11 @@ describe('Indiware Student', () => {
             .basicAuth({ user: 'schueler', pass: '123' })
             .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/Klassen.xml'), { encoding: 'utf8' }));
     });
-    it('should return an object with head, body and footer', async done => {
+    it('should return an object with head, body and footer', async () => {
         const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
         expect(vplan).toHaveProperty('head');
         expect(vplan).toHaveProperty('body');
         expect(vplan).toHaveProperty('footer');
-        done();
     });
 
     describe('request specific date', () => {
@@ -26,16 +25,15 @@ describe('Indiware Student', () => {
                 .basicAuth({ user: 'schueler', pass: '123' })
                 .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/PlanKl20200106.xml'), { encoding: 'utf8' }));
         });
-        it('should return an object with head, body and footer', async done => {
+        it('should return an object with head, body and footer', async () => {
             const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', date: '20200106', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             expect(vplan).toHaveProperty('head');
             expect(vplan.head.filename).toEqual('PlanKl20200106.xml');
-            done();
         });
     });
 
     describe('header data', () => {
-        it('should have header data', async done => {
+        it('should have header data', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { head } = schedule;
             expect(head).toBeDefined();
@@ -43,10 +41,9 @@ describe('Indiware Student', () => {
             expect(head.timestamp).toBeTruthy();
             expect(head.type).toEqual('K');
             expect(head.filename).toBeTruthy();
-            done();
         });
 
-        it('should have property with dates to skip', async done => {
+        it('should have property with dates to skip', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { head } = schedule;
             expect(head.skipDates).toBeTruthy();
@@ -117,70 +114,62 @@ describe('Indiware Student', () => {
                 new Date(2020, 6, 30).toUTCString(),
                 new Date(2020, 6, 31).toUTCString()
             ])
-            done();
         });
     });
 
     describe('body data', () => {
-        it('should have empty body data if class is not valid', async done => {
+        it('should have empty body data if class is not valid', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: 'something', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             expect(body).toEqual(null);
-            done();
         });
 
-        it('should have class data', async done => {
+        it('should have class data', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '6/3', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             expect(body.short).toEqual('6/3')
-            done();
         });
 
-        it('show if teacher has changed', async done => {
+        it('show if teacher has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '6/3', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 3);
             expect(deutschKurs.lessonName).toEqual('DE');
             expect(deutschKurs.teacherHasChanged).toEqual(true);
-            done();
         });
 
-        it('show if room has changed', async done => {
+        it('show if room has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '10/2', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 5);
             expect(deutschKurs.lessonName).toEqual('BIO');
             expect(deutschKurs.roomHasChanged).toEqual(true);
-            done();
         });
 
-        it('show if lessonName has changed', async done => {
+        it('show if lessonName has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '5/1', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 5);
             expect(deutschKurs.lessonName).toEqual('MA');
             expect(deutschKurs.lessonNameHasChanged).toEqual(true);
-            done();
         });
 
-        it('show schedule comment', async done => {
+        it('show schedule comment', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '9/1', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 6);
             expect(deutschKurs.lessonName).toEqual('GE');
             expect(deutschKurs.comment).toBeDefined();
             expect(deutschKurs.comment).toMatch('fällt aus');
-            done();
         });
     });
 
-    it('should have footer data', async done => {
+    it('should have footer data', async () => {
         const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_STUDENT, class: '11', configuration: { schoolId: '10107295', username: 'schueler', password: '123' } });
         const { footer } = schedule;
         expect(footer).toBeDefined();
         expect(footer.comments.length === 3);
         expect(footer.comments[0]).toMatch('Klassenstufe 6:');
-        done();
     });
 });
 
@@ -191,12 +180,11 @@ describe('Indiware Teachers', () => {
             .basicAuth({ user: 'lehrer', pass: '123' })
             .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/Lehrer.xml'), { encoding: 'utf8' }));
     });
-    it('should return an object with head, body and footer', async done => {
+    it('should return an object with head, body and footer', async () => {
         const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
         expect(vplan).toHaveProperty('head');
         expect(vplan).toHaveProperty('body');
         expect(vplan).toHaveProperty('footer');
-        done();
     });
 
     describe('request specific date', () => {
@@ -206,16 +194,15 @@ describe('Indiware Teachers', () => {
                 .basicAuth({ user: 'lehrer', pass: '123' })
                 .reply(200, readFileSync(resolve(process.cwd(), 'test/mock/indiware/PlanLe20200106.xml'), { encoding: 'utf8' }));
         });
-        it('should return an object with head, body and footer', async done => {
+        it('should return an object with head, body and footer', async () => {
             const vplan = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', date: '20200106', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             expect(vplan).toHaveProperty('head');
             expect(vplan.head.filename).toEqual('PlanLe20200106.xml');
-            done();
         });
     });
 
     describe('header data', () => {
-        it('should have header data', async done => {
+        it('should have header data', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { head } = schedule;
             expect(head).toBeDefined();
@@ -223,10 +210,9 @@ describe('Indiware Teachers', () => {
             expect(head.timestamp).toBeTruthy();
             expect(head.type).toEqual('L');
             expect(head.filename).toBeTruthy();
-            done();
         });
 
-        it('should have property with dates to skip', async done => {
+        it('should have property with dates to skip', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: '', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { head } = schedule;
             expect(head.skipDates).toBeTruthy();
@@ -297,69 +283,61 @@ describe('Indiware Teachers', () => {
                 new Date(2020, 6, 30).toUTCString(),
                 new Date(2020, 6, 31).toUTCString()
             ])
-            done();
         });
     });
 
     describe('body data', () => {
-        it('should have empty body data if class is not valid', async done => {
+        it('should have empty body data if class is not valid', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'something', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { body } = schedule;
             expect(body).toEqual(null);
-            done();
         });
 
-        it('should have class data', async done => {
+        it('should have class data', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'All', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { body } = schedule;
             expect(body.short).toEqual('All')
-            done();
         });
 
-        it('show if teacher has changed', async done => {
+        it('show if teacher has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Sat', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 5);
             expect(deutschKurs.lessonName).toEqual('EthK');
             expect(deutschKurs.teacherHasChanged).toEqual(true);
-            done();
         });
 
-        it('show if room has changed', async done => {
+        it('show if room has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Brü', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 3);
             expect(deutschKurs.lessonName).toEqual('---');
             expect(deutschKurs.roomHasChanged).toEqual(true);
-            done();
         });
 
-        it('show if lessonName has changed', async done => {
+        it('show if lessonName has changed', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Grü', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { body } = schedule;
             const deutschKurs = body.schedule.find(schedule => schedule.lessonIndex === 3);
             expect(deutschKurs.lessonName).toEqual('---');
             expect(deutschKurs.lessonNameHasChanged).toEqual(true);
-            done();
         });
     });
 
     describe('footer data', () => {
-        it('should have footer data', async done => {
+        it('should have footer data', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Har', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { footer } = schedule;
             expect(footer).toBeDefined();
-            done();
         });
 
-        it('should have supervision data if there is any', async done => {
+        it('should have supervision data if there is any', async () => {
             const schedule = await Indiware.getSchedule({ source: ScheduleOptionsSource.INDIWARE_TEACHER, class: 'Har', configuration: { schoolId: '10107295', username: 'lehrer', password: '123' } });
             const { footer } = schedule;
             expect(footer.supervisions).toBeDefined();
             expect(footer.supervisions.length).toEqual(1);
             expect(footer.supervisions[0]).toEqual({ time: '13:00', location: 'Haus D' });
             expect(footer).toBeDefined();
-            done();
         });
 
     });
