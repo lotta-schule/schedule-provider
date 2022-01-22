@@ -22,5 +22,5 @@ for more information on the output format
 
 ## Usage
 
-- Start the project with `docker-compose up`
+- Start the project with `npm run dev:start`
 - Access the API like this: `curl http://localhost:3000/schedule.json?class=(11)&password=(PASSWORD)&schoolId=(SCHOOL_ID)&source=(IndiwareStudent|IndiwareTeacher)&username=(USERNAME)&date=(YYYYMMDD)`
