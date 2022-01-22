@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set env
+    - name: Set branch name
+      id: branch_name
       run: |
-        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
 
     - name: Docker Login
       uses: docker/login-action@v1.10.0
@@ -25,7 +26,9 @@ jobs:
     - name: Tag and push image
       run: |
         docker pull lotta/schedule-provider:$GITHUB_SHA
-        docker tag lotta/schedule-provider:$GITHUB_SHA lotta/schedule-provider:$GITHUB_ENV
-        docker push lotta/schedule-provider:$GITHUB_ENV
+        docker tag lotta/schedule-provider:$GITHUB_SHA lotta/schedule-provider:$SOURCE_TAG
+        docker push lotta/schedule-provider:$SOURCE_TAG
         docker tag lotta/schedule-provider:$GITHUB_SHA lotta/schedule-provider:latest
         docker push lotta/schedule-provider:latest
+      env:
+        SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
