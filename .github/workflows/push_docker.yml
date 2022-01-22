@@ -5,9 +5,6 @@ on:
     types: [closed]
     branches:
       - develop
-  push:
-    tags:
-      - *
 
 jobs:
     
@@ -17,11 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Set env
-      run: |
-        if [[ $GITHUB_REF == refs/tags/* ]]; then
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        fi;
 
     - name: Download built image
       if: github.event.pull_request.merged
@@ -47,11 +39,5 @@ jobs:
       run: |
         docker tag lotta/schedule-provider lotta/schedule-provider:$GITHUB_SHA
         docker push lotta/schedule-provider:$GITHUB_SHA
-        if [ -z "$RELEASE_VERSION" ]; then
-          docker tag lotta/schedule-provider lotta/schedule-provider:develop
-          docker push lotta/schedule-provider:develop
-        else
-          docker tag lotta/schedule-provider lotta/schedule-provider:$RELEASE_VERSION
-          docker push lotta/schedule-provider:$RELEASE_VERSION
-          docker push lotta/schedule-provider
-        fi
+        docker tag lotta/schedule-provider lotta/schedule-provider:develop
+        docker push lotta/schedule-provider:develop
