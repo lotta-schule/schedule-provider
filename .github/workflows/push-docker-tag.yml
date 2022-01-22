@@ -3,7 +3,7 @@ name: "Tag docker container"
 on:
   create:
     tags:
-      - *
+      - '*'
 
 jobs:
 
