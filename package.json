@@ -7,7 +7,7 @@
     "clean": "rimraf dist/*",
     "build": "swc src -d dist",
     "dev:start": "npm-run-all clean build start",
-    "dev": "nodemon --watch src -e ts,ejs --exec npm run dev:start",
+    "dev": "nodemon --watch src -e ts --exec npm run dev:start",
     "start": "node dist/index",
     "test": "jest",
     "prepare": "husky install"
