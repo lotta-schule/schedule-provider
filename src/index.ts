@@ -6,10 +6,13 @@ try {
 import { init } from "@sentry/node";
 import { App } from "./App";
 
+const imageName = process.env.IMAGE_NAME || "test";
+
 if (process.env.SENTRY_DSN) {
   init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.APP_ENVIRONMENT ?? process.env.NODE_ENV,
+    release: imageName.split(":")[1],
   });
 }
 
