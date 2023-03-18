@@ -1,9 +1,9 @@
-import Express, { Application } from "express";
-import * as Sentry from "@sentry/node";
-import morgan from "morgan";
-import { createServer } from "http";
-import { Indiware } from "./scheduleSources/Indiware";
-import { ScheduleOptionsSource } from "./model/ScheduleOptions";
+import Express, { Application } from 'express';
+import * as Sentry from '@sentry/node';
+import morgan from 'morgan';
+import { createServer } from 'http';
+import { Indiware } from './scheduleSources/Indiware';
+import { ScheduleOptionsSource } from './model/ScheduleOptions';
 
 export class App {
   private expressApp: Application = Express();
@@ -28,11 +28,11 @@ export class App {
 
   private setMiddlewares() {
     this.expressApp.use(
-      morgan(process.env.NODE_ENV === "production" ? "combined" : "dev", {
-        skip: () => process.env.NODE_ENV === "test",
+      morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
+        skip: () => process.env.NODE_ENV === 'test',
       })
     );
-    this.expressApp.get("/schedule.json", async (request, response, _next) => {
+    this.expressApp.get('/schedule.json', async (request, response, _next) => {
       const schoolId = request.query.schoolId as string;
       const username = request.query.username as string;
       const password = request.query.password as string;
@@ -47,7 +47,7 @@ export class App {
           source,
           configuration: { schoolId, username, password },
         });
-        response.header("Content-Type", "application/json").send(schedule);
+        response.header('Content-Type', 'application/json').send(schedule);
       } catch (e) {
         console.error(e);
         response.sendStatus(400);

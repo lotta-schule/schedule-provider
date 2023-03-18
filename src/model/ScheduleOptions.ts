@@ -1,6 +1,6 @@
 export enum ScheduleOptionsSource {
-  INDIWARE_STUDENT = "IndiwareStudent",
-  INDIWARE_TEACHER = "IndiwareTeacher",
+  INDIWARE_STUDENT = 'IndiwareStudent',
+  INDIWARE_TEACHER = 'IndiwareTeacher',
 }
 
 export interface ScheduleOptions<T = any> {

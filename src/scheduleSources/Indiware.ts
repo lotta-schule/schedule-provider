@@ -1,15 +1,15 @@
 import {
   ScheduleOptions,
   ScheduleOptionsSource,
-} from "../model/ScheduleOptions";
-import { parseStringPromise } from "xml2js";
+} from '../model/ScheduleOptions';
+import { parseStringPromise } from 'xml2js';
 import {
   ScheduleResultHead,
   ScheduleResultBody,
   ScheduleResultFooter,
-} from "../model/ScheduleResult";
-import { ScheduleResult } from "../model/ScheduleResult";
-import axios, { AxiosRequestConfig } from "axios";
+} from '../model/ScheduleResult';
+import { ScheduleResult } from '../model/ScheduleResult';
+import axios, { AxiosRequestConfig } from 'axios';
 
 export interface IndiwareOptions {
   schoolId: string;
@@ -39,9 +39,27 @@ interface IndiwareResult {
               {
                 Std: {
                   St: [string];
-                  Fa: [string | { $: { [key: string]: string }; _: string }];
-                  Le: [string | { $: { [key: string]: string }; _: string }];
-                  Ra: [string | { $: { [key: string]: string }; _: string }];
+                  Fa: [
+                    | string
+                    | {
+                        $: { [key: string]: string };
+                        _: string;
+                      }
+                  ];
+                  Le: [
+                    | string
+                    | {
+                        $: { [key: string]: string };
+                        _: string;
+                      }
+                  ];
+                  Ra: [
+                    | string
+                    | {
+                        $: { [key: string]: string };
+                        _: string;
+                      }
+                  ];
                   Nr: [string];
                   If: [string];
                 }[];
@@ -111,15 +129,15 @@ export class Indiware {
         short: klasse.Kurz[0],
         schedule: klasse.Pl[0].Std.map((Std) => {
           const [lessonName, lessonNameHasChanged] =
-            typeof Std.Fa[0] === "string"
+            typeof Std.Fa[0] === 'string'
               ? [Std.Fa[0], false]
               : [Std.Fa[0]._, true];
           const [teacher, teacherHasChanged] =
-            typeof Std.Le[0] === "string"
+            typeof Std.Le[0] === 'string'
               ? [Std.Le[0], false]
               : [Std.Le[0]._, true];
           const [room, roomHasChanged] =
-            typeof Std.Ra[0] === "string"
+            typeof Std.Ra[0] === 'string'
               ? [Std.Ra[0], false]
               : [Std.Ra[0]._, true];
           return {
@@ -187,16 +205,16 @@ export class Indiware {
   private static getFileUrl(options: ScheduleOptions<IndiwareOptions>): string {
     const baseUrl = `https://www.stundenplan24.de/${options.configuration.schoolId}/`;
     if (options.source === ScheduleOptionsSource.INDIWARE_TEACHER) {
-      const path = "moble/mobdaten/";
+      const path = 'moble/mobdaten/';
       const filename = options.date
         ? `PlanLe${options.date}.xml`
-        : "Lehrer.xml";
+        : 'Lehrer.xml';
       return baseUrl + path + filename;
     } else {
-      const path = "mobil/mobdaten/";
+      const path = 'mobil/mobdaten/';
       const filename = options.date
         ? `PlanKl${options.date}.xml`
-        : "Klassen.xml";
+        : 'Klassen.xml';
       return baseUrl + path + filename;
     }
   }
@@ -205,7 +223,7 @@ export class Indiware {
     options: ScheduleOptions<IndiwareOptions>
   ): Promise<any> {
     const axiosConfig: AxiosRequestConfig = {
-      method: "GET",
+      method: 'GET',
       url: this.getFileUrl(options),
       responseType: undefined,
     };
