@@ -1,4 +1,4 @@
-FROM node:19-alpine AS dependencies
+FROM node:24-alpine AS dependencies
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -7,7 +7,7 @@ RUN npm ci
 
 
 
-FROM node:19.0-alpine AS builder
+FROM node:24.0-alpine AS builder
 WORKDIR /app
 
 COPY . .
@@ -17,13 +17,13 @@ RUN npm run build
 
 
 
-FROM node:19.0-alpine AS runner
+FROM node:24.0-alpine AS runner
 WORKDIR /app
 
 RUN addgroup -g 1001 -S lotta
 RUN adduser -S lotta -u 1001
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules

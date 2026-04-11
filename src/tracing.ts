@@ -2,8 +2,8 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
-import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_NAMESPACE } from '@opentelemetry/semantic-conventions';
 
 // configure the SDK to export telemetry data to the console
 // enable all auto-instrumentations from the meta package
@@ -12,10 +12,9 @@ const exporterOptions = {
 };
 const traceExporter = new OTLPTraceExporter(exporterOptions);
 const sdk = new NodeSDK({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]:
-      process.env.SERVICE_NAME || 'schedule-provider',
-    [SemanticResourceAttributes.SERVICE_NAMESPACE]: process.env.SERVICE_NAME,
+  resource: resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: process.env.SERVICE_NAME || 'schedule-provider',
+    [ATTR_SERVICE_NAMESPACE]: process.env.SERVICE_NAME,
   }),
   traceExporter,
   instrumentations: [getNodeAutoInstrumentations()],
