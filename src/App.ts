@@ -14,9 +14,8 @@ export class App {
 
   constructor() {
     if (process.env.SENTRY_DSN) {
-      this.expressApp.use(Sentry.Handlers.requestHandler());
       this.setMiddlewares();
-      this.expressApp.use(Sentry.Handlers.errorHandler());
+      Sentry.setupExpressErrorHandler(this.expressApp);
     } else {
       this.setMiddlewares();
     }
